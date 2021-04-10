@@ -1,23 +1,25 @@
 package run.halo.app.model.params;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.Data;
 import lombok.ToString;
 import run.halo.app.model.dto.base.InputConverter;
 import run.halo.app.model.entity.Menu;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 /**
  * Menu param.
  *
  * @author johnniang
+ * @author ryanwang
  * @date 4/3/19
  */
 @Data
 @ToString
 public class MenuParam implements InputConverter<Menu> {
+
+    private Integer id;
 
     @NotBlank(message = "菜单名称不能为空")
     @Size(max = 50, message = "菜单名称的字符长度不能超过 {max}")
@@ -37,4 +39,7 @@ public class MenuParam implements InputConverter<Menu> {
     private String icon;
 
     private Integer parentId;
+
+    @Size(max = 255, message = "菜单分组的字符长度不能超过 {max}")
+    private String team;
 }

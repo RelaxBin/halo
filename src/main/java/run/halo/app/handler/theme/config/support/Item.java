@@ -1,17 +1,17 @@
 package run.halo.app.handler.theme.config.support;
 
+import java.util.List;
+import java.util.Objects;
 import lombok.Data;
 import run.halo.app.model.enums.DataType;
 import run.halo.app.model.enums.InputType;
-
-import java.util.List;
-import java.util.Objects;
 
 /**
  * Theme configuration: item entity
  *
  * @author johnniang
- * @date 4/10/19
+ * @author ryanwang
+ * @date 2019-04-10
  */
 @Data
 public class Item {
@@ -47,14 +47,23 @@ public class Item {
     private String placeholder;
 
     /**
+     * Text item description.
+     */
+    private String description;
+
+    /**
      * Item's options, default is empty list
      */
     private List<Option> options;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Item item = (Item) o;
         return name.equals(item.name);
     }

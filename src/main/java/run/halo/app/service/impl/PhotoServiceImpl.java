@@ -1,5 +1,11 @@
 package run.halo.app.service.impl;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.criteria.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,18 +24,11 @@ import run.halo.app.service.PhotoService;
 import run.halo.app.service.base.AbstractCrudService;
 import run.halo.app.utils.ServiceUtils;
 
-import javax.persistence.criteria.Predicate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 /**
  * PhotoService implementation class
  *
  * @author ryanwang
- * @date : 2019-03-14
+ * @date 2019-03-14
  */
 @Service
 public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implements PhotoService {
@@ -41,25 +40,14 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         this.photoRepository = photoRepository;
     }
 
-    /**
-     * List photo dtos.
-     *
-     * @param sort sort
-     * @return all photos
-     */
     @Override
     public List<PhotoDTO> listDtos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
 
-        return listAll(sort).stream().map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo)).collect(Collectors.toList());
+        return listAll(sort).stream().map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
+            .collect(Collectors.toList());
     }
 
-    /**
-     * Lists photo team vos.
-     *
-     * @param sort must not be null
-     * @return a list of photo team vo
-     */
     @Override
     public List<PhotoTeamVO> listTeamVos(Sort sort) {
         Assert.notNull(sort, "Sort info must not be null");
@@ -70,7 +58,8 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         // Get teams
         Set<String> teams = ServiceUtils.fetchProperty(photos, PhotoDTO::getTeam);
 
-        Map<String, List<PhotoDTO>> teamPhotoListMap = ServiceUtils.convertToListMap(teams, photos, PhotoDTO::getTeam);
+        Map<String, List<PhotoDTO>> teamPhotoListMap =
+            ServiceUtils.convertToListMap(teams, photos, PhotoDTO::getTeam);
 
         List<PhotoTeamVO> result = new LinkedList<>();
 
@@ -88,17 +77,20 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return result;
     }
 
-    /**
-     * List photos by team.
-     *
-     * @param team team
-     * @param sort sort
-     * @return list of photos
-     */
     @Override
     public List<PhotoDTO> listByTeam(String team, Sort sort) {
         List<Photo> photos = photoRepository.findByTeam(team, sort);
-        return photos.stream().map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo)).collect(Collectors.toList());
+        return photos.stream().map(photo -> (PhotoDTO) new PhotoDTO().convertFrom(photo))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<PhotoDTO> pageBy(Pageable pageable) {
+        Assert.notNull(pageable, "Page info must not be null");
+
+        Page<Photo> photos = photoRepository.findAll(pageable);
+
+        return photos.map(photo -> new PhotoDTO().convertFrom(photo));
     }
 
     @Override
@@ -119,11 +111,16 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
         return create(photoParam.convertTo());
     }
 
+    @Override
+    public List<String> listAllTeams() {
+        return photoRepository.findAllTeams();
+    }
+
     @NonNull
     private Specification<Photo> buildSpecByQuery(@NonNull PhotoQuery photoQuery) {
-        Assert.notNull(photoQuery, "Attachment query must not be null");
+        Assert.notNull(photoQuery, "Photo query must not be null");
 
-        return (Specification<Photo>) (root, query, criteriaBuilder) -> {
+        return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new LinkedList<>();
 
             if (photoQuery.getTeam() != null) {
@@ -132,10 +129,12 @@ public class PhotoServiceImpl extends AbstractCrudService<Photo, Integer> implem
 
             if (photoQuery.getKeyword() != null) {
 
-                String likeCondition = String.format("%%%s%%", StringUtils.strip(photoQuery.getKeyword()));
+                String likeCondition =
+                    String.format("%%%s%%", StringUtils.strip(photoQuery.getKeyword()));
 
                 Predicate nameLike = criteriaBuilder.like(root.get("name"), likeCondition);
-                Predicate descriptionLike = criteriaBuilder.like(root.get("description"), likeCondition);
+                Predicate descriptionLike =
+                    criteriaBuilder.like(root.get("description"), likeCondition);
                 Predicate locationLike = criteriaBuilder.like(root.get("location"), likeCondition);
 
                 predicates.add(criteriaBuilder.or(nameLike, descriptionLike, locationLike));

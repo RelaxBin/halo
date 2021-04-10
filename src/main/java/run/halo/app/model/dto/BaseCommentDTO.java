@@ -1,5 +1,6 @@
 package run.halo.app.model.dto;
 
+import java.util.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -7,12 +8,12 @@ import run.halo.app.model.dto.base.OutputConverter;
 import run.halo.app.model.entity.BaseComment;
 import run.halo.app.model.enums.CommentStatus;
 
-import java.util.Date;
-
 /**
  * Base comment output dto.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-20
  */
 @Data
 @ToString
@@ -29,7 +30,7 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
 
     private String authorUrl;
 
-    private String gavatarMd5;
+    private String gravatarMd5;
 
     private String content;
 
@@ -41,6 +42,9 @@ public class BaseCommentDTO implements OutputConverter<BaseCommentDTO, BaseComme
 
     private Boolean isAdmin;
 
+    private Boolean allowNotification;
+
     private Date createTime;
 
+    private String avatar;
 }

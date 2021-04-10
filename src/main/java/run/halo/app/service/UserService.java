@@ -1,19 +1,21 @@
 package run.halo.app.service;
 
+import java.util.Optional;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.exception.ForbiddenException;
 import run.halo.app.exception.NotFoundException;
 import run.halo.app.model.entity.User;
+import run.halo.app.model.enums.MFAType;
 import run.halo.app.model.params.UserParam;
 import run.halo.app.service.base.CrudService;
 
-import java.util.Optional;
-
 /**
- * User service.
+ * User service interface.
  *
  * @author johnniang
+ * @author ryanwang
+ * @date 2019-03-14
  */
 public interface UserService extends CrudService<User, Integer> {
 
@@ -83,11 +85,12 @@ public interface UserService extends CrudService<User, Integer> {
      *
      * @param oldPassword old password must not be blank
      * @param newPassword new password must not be blank
-     * @param userId      user id must not be null
+     * @param userId user id must not be null
      * @return updated user detail
      */
     @NonNull
-    User updatePassword(@NonNull String oldPassword, @NonNull String newPassword, @NonNull Integer userId);
+    User updatePassword(@NonNull String oldPassword, @NonNull String newPassword,
+        @NonNull Integer userId);
 
     /**
      * Creates an user.
@@ -109,7 +112,7 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Checks the password is match the user password.
      *
-     * @param user          user info must not be null
+     * @param user user info must not be null
      * @param plainPassword plain password
      * @return true if the given password is match the user password; false otherwise
      */
@@ -118,8 +121,29 @@ public interface UserService extends CrudService<User, Integer> {
     /**
      * Set user password.
      *
-     * @param user          user must not be null
+     * @param user user must not be null
      * @param plainPassword plain password must not be blank
      */
     void setPassword(@NonNull User user, @NonNull String plainPassword);
+
+    /**
+     * verify user's email and username
+     *
+     * @param username username must not be null
+     * @param password password must not be null
+     * @return boolean
+     */
+    boolean verifyUser(@NonNull String username, @NonNull String password);
+
+    /**
+     * Updates user Multi-Factor Auth.
+     *
+     * @param mfaType Multi-Factor Auth Type.
+     * @param mfaKey Multi-Factor Auth Key.
+     * @param userId user id must not be null
+     * @return updated user detail
+     */
+    @NonNull
+    User updateMFA(@NonNull MFAType mfaType, String mfaKey, @NonNull Integer userId);
+
 }

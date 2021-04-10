@@ -2,16 +2,18 @@ package run.halo.app.service;
 
 import org.springframework.lang.NonNull;
 import run.halo.app.model.dto.EnvironmentDTO;
-import run.halo.app.model.dto.StatisticDTO;
+import run.halo.app.model.dto.LoginPreCheckDTO;
+import run.halo.app.model.entity.User;
 import run.halo.app.model.params.LoginParam;
+import run.halo.app.model.params.ResetPasswordParam;
 import run.halo.app.security.token.AuthToken;
 
 /**
- * Admin service.
+ * Admin service interface.
  *
  * @author johnniang
  * @author ryanwang
- * @date 19-4-29
+ * @date 2019-04-29
  */
 public interface AdminService {
 
@@ -22,18 +24,25 @@ public interface AdminService {
 
     int REFRESH_TOKEN_EXPIRED_DAYS = 30;
 
-    String ACCESS_TOKEN_CACHE_PREFIX = "halo.admin.access_token.";
-
-    String REFRESH_TOKEN_CACHE_PREFIX = "halo.admin.refresh_token.";
+    String LOG_PATH = "logs/spring.log";
 
     /**
-     * Authenticates.
+     * Authenticates username password.
      *
      * @param loginParam login param must not be null
-     * @return authentication token
+     * @return User
      */
     @NonNull
-    AuthToken authenticate(@NonNull LoginParam loginParam);
+    User authenticate(@NonNull LoginParam loginParam);
+
+    /**
+     * Check authCode and build authToken.
+     *
+     * @param loginParam login param must not be null
+     * @return User
+     */
+    @NonNull
+    AuthToken authCodeCheck(@NonNull LoginParam loginParam);
 
     /**
      * Clears authentication.
@@ -41,12 +50,18 @@ public interface AdminService {
     void clearToken();
 
     /**
-     * Get system counts.
+     * Send reset password code to administrator's email.
      *
-     * @return count dto
+     * @param param param must not be null
      */
-    @NonNull
-    StatisticDTO getCount();
+    void sendResetPasswordCode(@NonNull ResetPasswordParam param);
+
+    /**
+     * Reset password by code.
+     *
+     * @param param param must not be null
+     */
+    void resetPasswordByCode(@NonNull ResetPasswordParam param);
 
     /**
      * Get system environments
@@ -64,4 +79,20 @@ public interface AdminService {
      */
     @NonNull
     AuthToken refreshToken(@NonNull String refreshToken);
+
+    /**
+     * Get halo logs content.
+     *
+     * @param lines lines
+     * @return logs content.
+     */
+    String getLogFiles(@NonNull Long lines);
+
+    /**
+     * Get user login env
+     *
+     * @param username username must not be null
+     * @return LoginEnvDTO
+     */
+    LoginPreCheckDTO getUserEnv(@NonNull String username);
 }
